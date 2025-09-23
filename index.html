@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>気になるあの人との相性は？相性診断テスト</title>
+  <style>
+    body {
+      font-family: "Arial", "Hiragino Kaku Gothic ProN", sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #ffe6f0, #e6f0ff);
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 350px;
+      animation: fadeIn 1s ease;
+    }
+
+    h1 {
+      color: #d6336c;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background: #ff4d6d;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #ff1a4d;
+      box-shadow: 0 0 10px #ff4d6d;
+    }
+
+    #result {
+      margin-top: 25px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      white-space: pre-line; /* 改行を表示 */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>💘 気になるあの人との相性は？相性診断テスト 💘</h1>
+    <form id="form">
+      <input type="text" id="userName" placeholder="あなたの名前" required><br>
+      <input type="text" id="partnerName" placeholder="相手の名前" required><br>
+      <button type="submit">診断する</button>
+    </form>
+    <p id="result"></p>
+  </div>
+
+ <script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbw19rkrPove1RsDohJmO7uDC9XGOaQBzJ-zxiUjExfGoXgzNBvH80jObtzNUBTTF2fE/exec"; // Apps Script のURLに差し替え
+
+  document.getElementById("form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const userName = document.getElementById("userName").value.trim();
+    const partnerName = document.getElementById("partnerName").value.trim();
+
+    // ---- 名前からハッシュ値を作って固定スコアにする ----
+    const combined = userName + partnerName;
+    let hash = 0;
+    for (let i = 0; i < combined.length; i++) {
+      hash = (hash * 31 + combined.charCodeAt(i)) % 1000000;
+    }
+    const rawScore = Math.round((hash % 1001) / 10); // 0.0〜100.0%
+
+    // ---- メッセージ（5％ごとに21段階） ----
+    const messages = [
+      "0〜4.9%: うーん…ほぼゼロ😭",
+      "5〜9.9%: まだチャンスは小さいかも💦",
+      "10〜14.9%: ちょっと厳しいかも…🤔",
+      "15〜19.9%: 友達としてはアリかも👌",
+      "20〜24.9%: まあまあの相性！✨",
+      "25〜29.9%: 意外と気が合うかも？😎",
+      "30〜34.9%: 良い感じの相性！🍀",
+      "35〜39.9%: まだまだ伸びしろアリ🔥",
+      "40〜44.9%: 普通の相性🙂",
+      "45〜49.9%: 半分は運命かも！？🤯",
+      "50〜54.9%: ちょうど真ん中！🍵",
+      "55〜59.9%: なかなかいい感じ✨",
+      "60〜64.9%: 好きになったら止まらない💘",
+      "65〜69.9%: かなり相性いいね😍",
+      "70〜74.9%: 恋人レベル💖",
+      "75〜79.9%: もはや運命！？🌟",
+      "80〜84.9%: 奇跡の相性！💘",
+      "85〜89.9%: 最高にお似合い🎉",
+      "90〜94.9%: 完璧に近い相性✨",
+      "95〜99.9%: ほぼ100％！神レベル💎",
+      "100%: 完璧すぎる運命の相手！💍"
+    ];
+
+    const index = Math.floor(rawScore / 5);
+    const message = messages[index];
+
+    const resultText = `相性は ${rawScore}% です！\n${message}`;
+
+    document.getElementById("result").innerText =
+      `${userName} さんと ${partnerName} さんの診断結果：\n${resultText}`;
+
+    // ---- スプレッドシートに保存 ----
+    fetch(scriptURL, {
+      method: "POST",
+      body: JSON.stringify({ userName, partnerName, result: resultText })
+    });
+  });
+</script>
